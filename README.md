@@ -39,6 +39,8 @@ AyahFlow/
 
 ## 🚀 Setup Instructions
 
+> **Quick Start**: For a simple Vercel deployment guide, see [VERCEL_SETUP.md](./VERCEL_SETUP.md)
+
 ### 1. Prerequisites
 
 - Node.js 18+ installed
@@ -81,33 +83,37 @@ cp .env.example .env
 # - BOT_TOKEN=your_bot_token
 # - CHANNEL_ID=your_channel_id
 # - WEBHOOK_SECRET_TOKEN=random_secret_string
-# - POSTGRES_URL=your_database_url
+# - PRISMA_DATABASE_URL=your_prisma_database_url (recommended)
+# - POSTGRES_URL=your_database_url (alternative)
+# - DATABASE_URL=your_database_url (alternative)
 ```
 
 ### 5. Database Setup
 
-#### Option A: Vercel Postgres
+The app supports multiple database URL formats (checked in priority order):
+1. `PRISMA_DATABASE_URL` (recommended for free Postgres services)
+2. `POSTGRES_URL` (fallback)
+3. `DATABASE_URL` (fallback)
+
+#### Option A: Free PostgreSQL Services (Recommended)
+
+**Neon, Supabase, Railway, or any free PostgreSQL:**
+1. Sign up and create a new project
+2. Copy the Prisma-compatible connection string
+3. Add to `.env` as `PRISMA_DATABASE_URL`
+
+#### Option B: Vercel Postgres
 
 1. Go to your Vercel project dashboard
 2. Navigate to Storage → Create Database → Postgres
-3. Copy the connection strings to `.env`
-
-#### Option B: Neon
-
-1. Sign up at [neon.tech](https://neon.tech)
-2. Create a new project
-3. Copy the connection string to `.env` as `POSTGRES_URL`
-
-#### Option C: Supabase
-
-1. Sign up at [supabase.com](https://supabase.com)
-2. Create a new project
-3. Copy the connection string to `.env` as `POSTGRES_URL`
+3. Copy the connection string to `.env` as `PRISMA_DATABASE_URL` or `POSTGRES_URL`
 
 #### Run Migration
 
 ```bash
-# Set POSTGRES_URL in .env first
+# Set PRISMA_DATABASE_URL (or POSTGRES_URL) in .env first
+npm run db:migrate
+# or
 node scripts/migrate.js
 ```
 
@@ -205,14 +211,16 @@ Call `https://your-app.vercel.app/api/init-db` once, then delete the route.
 
 ## 🔧 Environment Variables
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `BOT_TOKEN` | Telegram bot token from BotFather | Yes |
-| `CHANNEL_ID` | Telegram channel ID (numeric) | Yes |
-| `WEBHOOK_SECRET_TOKEN` | Secret token for webhook validation | Yes |
-| `POSTGRES_URL` | PostgreSQL connection string | Yes |
-| `POSTGRES_PRISMA_URL` | Prisma-compatible connection string | Yes (Vercel Postgres) |
-| `POSTGRES_URL_NON_POOLING` | Non-pooling connection string | Yes (Vercel Postgres) |
+| Variable | Description | Required | Priority |
+|----------|-------------|----------|----------|
+| `BOT_TOKEN` | Telegram bot token from BotFather | Yes | - |
+| `CHANNEL_ID` | Telegram channel ID (numeric) | Yes | - |
+| `WEBHOOK_SECRET_TOKEN` | Secret token for webhook validation | Yes | - |
+| `PRISMA_DATABASE_URL` | Prisma-compatible PostgreSQL connection string | Yes* | 1st |
+| `POSTGRES_URL` | PostgreSQL connection string | Yes* | 2nd |
+| `DATABASE_URL` | Generic database connection string | Yes* | 3rd |
+
+\* At least one database URL must be provided (checked in priority order)
 
 ## 📡 API Endpoints
 

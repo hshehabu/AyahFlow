@@ -1,4 +1,4 @@
-import { sql } from '@vercel/postgres';
+import { Pool, QueryResult } from 'pg';
 
 export interface Video {
   id: number;
@@ -6,6 +6,58 @@ export interface Video {
   caption: string | null;
   message_id: number;
   posted_at: Date;
+}
+
+// Get database connection string from environment variables
+function getDatabaseUrl(): string {
+  // Priority: PRISMA_DATABASE_URL > POSTGRES_URL > DATABASE_URL
+  const url = 
+    process.env.PRISMA_DATABASE_URL || 
+    process.env.POSTGRES_URL || 
+    process.env.DATABASE_URL;
+  
+  if (!url) {
+    throw new Error(
+      'Database URL not found. Please set PRISMA_DATABASE_URL, POSTGRES_URL, or DATABASE_URL environment variable.'
+    );
+  }
+  
+  return url;
+}
+
+// Create a connection pool
+let pool: Pool | null = null;
+
+function getPool(): Pool {
+  if (!pool) {
+    const connectionString = getDatabaseUrl();
+    pool = new Pool({
+      connectionString,
+      ssl: connectionString.includes('sslmode=require') || connectionString.includes('ssl=true') 
+        ? { rejectUnauthorized: false } 
+        : undefined,
+    });
+    
+    // Handle pool errors
+    pool.on('error', (err) => {
+      console.error('Unexpected database pool error:', err);
+    });
+  }
+  
+  return pool;
+}
+
+// SQL template tag for querying
+export async function sql(
+  strings: TemplateStringsArray,
+  ...values: any[]
+): Promise<QueryResult> {
+  const pool = getPool();
+  const query = strings.reduce((acc, str, i) => {
+    return acc + str + (i < values.length ? `$${i + 1}` : '');
+  }, '');
+  
+  return pool.query(query, values);
 }
 
 export async function initDatabase() {
@@ -67,24 +119,23 @@ export async function getVideos(
   limit: number = 20
 ): Promise<{ videos: Video[]; nextCursor: number | null }> {
   try {
-    let query;
+    let result: QueryResult;
     
     if (cursor) {
-      query = sql`
+      result = await sql`
         SELECT * FROM videos
         WHERE id < ${cursor}
         ORDER BY posted_at DESC
         LIMIT ${limit + 1}
       `;
     } else {
-      query = sql`
+      result = await sql`
         SELECT * FROM videos
         ORDER BY posted_at DESC
         LIMIT ${limit + 1}
       `;
     }
     
-    const result = await query;
     const videos = result.rows as Video[];
     
     let nextCursor: number | null = null;
@@ -100,3 +151,10 @@ export async function getVideos(
   }
 }
 
+// Close database connections (useful for cleanup)
+export async function closeDatabase() {
+  if (pool) {
+    await pool.end();
+    pool = null;
+  }
+}

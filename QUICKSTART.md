@@ -20,7 +20,9 @@ Edit `.env`:
 - `BOT_TOKEN`: Get from [@BotFather](https://t.me/BotFather)
 - `CHANNEL_ID`: Your Telegram channel ID (negative number)
 - `WEBHOOK_SECRET_TOKEN`: Random secure string (min 32 chars)
-- `POSTGRES_URL`: Your PostgreSQL connection string
+- `PRISMA_DATABASE_URL`: Your Prisma-compatible PostgreSQL connection string (recommended)
+- `POSTGRES_URL`: Alternative database URL (if not using PRISMA_DATABASE_URL)
+- `DATABASE_URL`: Alternative database URL (if not using above)
 
 ### Step 3: Initialize Database
 
@@ -66,8 +68,9 @@ node scripts/setup-webhook.js \
 ## ❓ Common Issues
 
 **Database connection error?**
-- Verify `POSTGRES_URL` is correct
+- Verify `PRISMA_DATABASE_URL` (or `POSTGRES_URL`/`DATABASE_URL`) is correct
 - Check database is running/accessible
+- Ensure connection string format is valid
 
 **Webhook not working?**
 - Verify bot is admin in channel

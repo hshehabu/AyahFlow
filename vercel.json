@@ -8,9 +8,9 @@
     "BOT_TOKEN": "@bot_token",
     "CHANNEL_ID": "@channel_id",
     "WEBHOOK_SECRET_TOKEN": "@webhook_secret_token",
+    "PRISMA_DATABASE_URL": "@prisma_database_url",
     "POSTGRES_URL": "@postgres_url",
-    "POSTGRES_PRISMA_URL": "@postgres_prisma_url",
-    "POSTGRES_URL_NON_POOLING": "@postgres_url_non_pooling"
+    "DATABASE_URL": "@database_url"
   }
 }
 

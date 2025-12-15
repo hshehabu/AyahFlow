@@ -12,24 +12,23 @@
 
 ### 2. Database Setup
 
+The app supports multiple database URL formats (checked in priority order):
+1. `PRISMA_DATABASE_URL` (recommended for free Postgres services)
+2. `POSTGRES_URL` (fallback)
+3. `DATABASE_URL` (fallback)
+
 Choose one:
 
-#### Option A: Vercel Postgres (Recommended)
+#### Option A: Free PostgreSQL Services (Recommended)
+
+**Neon, Supabase, Railway, or any free PostgreSQL:**
+1. Sign up and create a new project
+2. Copy the Prisma-compatible connection string
+3. Add to environment variables as `PRISMA_DATABASE_URL`
+
+#### Option B: Vercel Postgres
 1. In Vercel dashboard → Storage → Create Database → Postgres
-2. Copy connection strings:
-   - `POSTGRES_URL`
-   - `POSTGRES_PRISMA_URL`
-   - `POSTGRES_URL_NON_POOLING`
-
-#### Option B: Neon
-1. Sign up at [neon.tech](https://neon.tech)
-2. Create project
-3. Copy connection string → `POSTGRES_URL`
-
-#### Option C: Supabase
-1. Sign up at [supabase.com](https://supabase.com)
-2. Create project → Settings → Database
-3. Copy connection string → `POSTGRES_URL`
+2. Copy connection string to `PRISMA_DATABASE_URL` or `POSTGRES_URL`
 
 ### 3. Deploy to Vercel
 
@@ -48,10 +47,10 @@ Choose one:
    BOT_TOKEN=your_bot_token
    CHANNEL_ID=your_channel_id
    WEBHOOK_SECRET_TOKEN=random_secret_string_min_32_chars
-   POSTGRES_URL=your_postgres_url
-   POSTGRES_PRISMA_URL=your_prisma_url (if using Vercel Postgres)
-   POSTGRES_URL_NON_POOLING=your_non_pooling_url (if using Vercel Postgres)
+   PRISMA_DATABASE_URL=your_prisma_database_url (recommended)
    ```
+   
+   **Note:** You can also use `POSTGRES_URL` or `DATABASE_URL` as alternatives.
 6. Deploy
 
 #### Via Vercel CLI
@@ -182,14 +181,16 @@ https://your-app.vercel.app
 
 ## Environment Variables Reference
 
-| Variable | Example | Notes |
-|----------|---------|-------|
-| `BOT_TOKEN` | `123456:ABC-DEF...` | From BotFather |
-| `CHANNEL_ID` | `-1001234567890` | Negative number for channels |
-| `WEBHOOK_SECRET_TOKEN` | `random_string_32_chars_min` | Generate securely |
-| `POSTGRES_URL` | `postgres://...` | Main connection string |
-| `POSTGRES_PRISMA_URL` | `postgres://...` | Prisma format (Vercel Postgres) |
-| `POSTGRES_URL_NON_POOLING` | `postgres://...` | Direct connection (Vercel Postgres) |
+| Variable | Example | Notes | Priority |
+|----------|---------|-------|----------|
+| `BOT_TOKEN` | `123456:ABC-DEF...` | From BotFather | Required |
+| `CHANNEL_ID` | `-1001234567890` | Negative number for channels | Required |
+| `WEBHOOK_SECRET_TOKEN` | `random_string_32_chars_min` | Generate securely | Required |
+| `PRISMA_DATABASE_URL` | `postgres://...` | Prisma-compatible connection string | 1st (recommended) |
+| `POSTGRES_URL` | `postgres://...` | Standard PostgreSQL connection string | 2nd (fallback) |
+| `DATABASE_URL` | `postgres://...` | Generic database connection string | 3rd (fallback) |
+
+**Note:** At least one database URL must be provided (checked in priority order above).
 
 ## Monitoring
 
