@@ -1,0 +1,16 @@
+{
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "regions": ["iad1"],
+  "env": {
+    "BOT_TOKEN": "@bot_token",
+    "CHANNEL_ID": "@channel_id",
+    "WEBHOOK_SECRET_TOKEN": "@webhook_secret_token",
+    "POSTGRES_URL": "@postgres_url",
+    "POSTGRES_PRISMA_URL": "@postgres_prisma_url",
+    "POSTGRES_URL_NON_POOLING": "@postgres_url_non_pooling"
+  }
+}
+
